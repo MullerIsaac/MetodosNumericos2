@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-def convolution(image, kernel, average=False):
+def convolution(image, kernel):
     if len(image.shape) == 3:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -23,8 +23,7 @@ def convolution(image, kernel, average=False):
     for row in range(image_row):
         for col in range(image_col):
             output[row, col] = np.sum(kernel * padded_image[row:row + kernel_row, col:col + kernel_col])
-            if average:
-                output[row, col] /= kernel.shape[0] * kernel.shape[1]
+    
 
     return output
 
@@ -32,6 +31,7 @@ def sobel_filter(image, filter, name):
     new_image = convolution(image, filter)
  
     cv2.imwrite(name, new_image)
+    return new_image
  
  
 if __name__ == '__main__':
@@ -39,6 +39,32 @@ if __name__ == '__main__':
 
     image = plt.imread('macacoBlured.jpg')
     
-    sobel_filter(image, filter, "macacoSobely.jpg")
+    '''geracao da matriz A'''
+    image_y = sobel_filter(image, filter, "macacoSobely.jpg")
 
-    sobel_filter(image, np.flip(filter.T, axis=0), "macacoSobelx.jpg")
+    '''geracao da matriz B'''
+    image_x = sobel_filter(image, np.flip(filter.T, axis=0), "macacoSobelx.jpg")
+
+    '''geracao da matriz C'''
+    gradiente = np.sqrt(np.square(image_x) + np.square(image_y))
+ 
+    cv2.imwrite('gradient.jpg', gradiente)
+
+    thr = float(0.5)
+
+    '''geracao da matriz D'''
+    matrix_d = np.zeros(image.shape)
+
+    gd_row, gd_col = gradiente.shape
+
+    for row in range(gd_row):
+        for col in range(gd_col):
+            if abs(gradiente[row, col]) >= thr : 
+                matrix_d[row, col] = 1
+            else:
+                matrix_d[row, col] = 0
+    
+    cv2.imwrite('matrizD.jpg', matrix_d)
+
+
+
