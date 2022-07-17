@@ -1,3 +1,9 @@
+'''
+Quadraturas especiais para n=2, 3 e 4. Não há partição!
+Membros: Isaac Miller
+	 Milton Cassul
+'''
+
 from math import sin, sqrt, pi
 
 def f(x):
